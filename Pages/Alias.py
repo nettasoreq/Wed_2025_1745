@@ -2,6 +2,7 @@ import os  # Operating System - פונה למערכת ההפעלה של המחש
 from dotenv import load_dotenv  # הספריה שהורדנו - של משתני הסביבה
 from google import genai  # generative ai = בינה מלאכותית יוצרת
 import streamlit as st  # ספריה של ממשקים GUI
+from Helper import * #תטען את קובץ ההלפר
 
 # הגדרות
 st.set_page_config(
@@ -9,14 +10,13 @@ st.set_page_config(
     page_icon='🤖'
 )
 
+setRTL()
 
 st.title("משחק אליאס")
 
-
-
-load_dotenv()  # טוענים את המשתנים
-API_KEY = os.getenv("API_KEY")  # פונים לקובץ env - ומבקשים את המשתנה API_KEY
-
+#load_dotenv()
+#API_KEY = os.getenv("API_KEY")  # פונים לקובץ env - ומבקשים את המשתנה API_KEY
+API_KEY = getAPIkey()
 
 # print(API_KEY)
 

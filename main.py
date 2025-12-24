@@ -6,16 +6,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# עיצוב כללי לימין + הסתרת תפריטים
-st.markdown("""
-<style>
-html, body, [class*="css"] {
-    direction: rtl;
-    text-align: right;
-    font-family: "Segoe UI", sans-serif;
-}
-</style>
-""", unsafe_allow_html=True)
 
 
 st.title("👑 הפרויקטים של נטע")
