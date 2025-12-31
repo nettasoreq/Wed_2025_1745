@@ -17,4 +17,4 @@ st.header("אלה הפרויקטים שלי: ")
 
 # 🎯 כאן משתמשים ב-st.page_link
 # Streamlit אוטומטית מזהה את הדפים מהתיקייה pages/
-st.page_link("Pages/Alias.py", label="🎲 משחק אליאס", icon="🎮")
+st.page_link("pages/Alias.py", label="🎲 משחק אליאס", icon="🎮")
