@@ -19,3 +19,6 @@ userinput = st.chat_input("השאלה שלך...")
 if userinput: #אם כתבתי הודעה
     Message("User",userinput)
 
+
+
+
