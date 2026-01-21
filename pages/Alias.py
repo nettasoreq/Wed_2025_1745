@@ -83,7 +83,8 @@ def send(prompt):
                 st.session_state.loading = False  # האם כרגע טוען
                 # print(st.session_state.history)
                 return message.text  # הצלחת לשלוח? תחזיר את התשובה
-            except:  # אם לא הצליח
+            except Exception as e:  # אם לא הצליח
+                print(e)
                 print("לא הצליח - מנסה את המודל הבא")
 
 

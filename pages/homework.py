@@ -12,12 +12,15 @@ st.title("בוט שיעורי בית")
 
 API_KEY = getAPIkey()
 
+#פה יהיה פרומפט
+
 Message("AI","היי איך אפשר לעזור לך")
 
 userinput = st.chat_input("השאלה שלך...")
 
 if userinput: #אם כתבתי הודעה
     Message("User",userinput)
+    sendMessage(userinput)
 
 
 
