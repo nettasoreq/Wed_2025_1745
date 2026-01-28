@@ -6,7 +6,6 @@ st.set_page_config(
     layout="wide"
 )
 
-print("hi netta")
 
 
 st.title("👑 הפרויקטים של נטע")
