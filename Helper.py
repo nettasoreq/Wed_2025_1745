@@ -6,6 +6,23 @@ import streamlit as st
 from google import genai  # generative ai = בינה מלאכותית יוצרת
 from google.genai import types  #מאפשר להגדיר תפקידים של רכיבים שנשלחים לג'מיני
 
+from duckduckgo_search import DDGS
+
+
+#טול חיפוש באינטרנט
+def web_search(query:str) -> str:   #מקבל טקסט ומחזיר טקסט
+    print("searching: " + query)
+    """
+    פונקציה שמקבלת ערכים לחיפוש ומחזירה תוצאות מובילות
+    """
+    #חיפוש
+    with DDGS() as d:
+        results = d.text(query,max_results=3)
+        print(results)
+
+web_search("Israel")
+
+
 st.session_state.page = "" #באיזה דף אני
 def newPage(pagename): #פונקציה שבודקת האם החלפתי דף
     if st.session_state.page != pagename:  #האם התחלף הדף
@@ -14,12 +31,24 @@ def newPage(pagename): #פונקציה שבודקת האם החלפתי דף
         st.session_state.history = [] #מאפסים את ההיסטוריה
 
 
+
 all_models = [
     "gemini-2.5-flash-lite",
     "gemini-2.5-flash",
     "gemini-2.0-flash",
-    "gemini-3-flash",
+    "gemini-3.0-flash",
     "gemini-2.0-flash-lite"]
+
+
+#tool - זמנים
+def currentTime():
+    print("use tool")
+    #טקסט לAI - שידע מה משמעות הפונקציה
+    """
+    כלי שיודע מה הזמן עכשיו  ומחזיר טקסט של הזמן הנוכחי
+    """
+    return time.ctime()
+
 
 #st.session_state - הזיכרון של האפליקציה
 def create_chat(model,instruction,history=[]):  #מקבל מודל והיסטוריה - לרוב ריקה
@@ -33,7 +62,9 @@ def create_chat(model,instruction,history=[]):  #מקבל מודל והיסטו�
         model = model,
         history= history,
         config = types.GenerateContentConfig(
-            system_instruction = instruction  #ההוראות לג'מיני
+            system_instruction = instruction,   #ההוראות לג'מיני
+            tools = [currentTime], #מה הוא יכול לעשות
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=False) #תפעיל את הטול אם אתה רוצה
         )
     ) #יוצרים צ'אט במודל ששלחנו
 
@@ -79,17 +110,11 @@ def sendMessage(prompt): #פונקציה ששולחת הודעה
             return
         if "overloaded" in error.lower(): #תבדוק האם מופיע שהסיבה היא שהמודל עמוס
             newChat(prompt)
-            # st.session_state.modelIndex +=1 #תוסיף 1 למספר המודלים
-            # if st.session_state.modelIndex == len(all_models): #אם נגמרו המודלים - תחזור לראשון
-            #     st.session_state.modelIndex = 0 #חוזר להיות 0
-            # newmodel = all_models[st.session_state.modelIndex]
-            # st.info (f"trying {newmodel}")
-            # create_chat(newmodel,"") #צור צ'אט חדש
-            # sendMessage(prompt) #תשלח את ההודעה
         if "429" in error: #אם קיבלנו שגיאה של יותר מדי קריאות
             with st.spinner("יותר מדי קריאות - מחכים דקה...", show_time=True):
                 time.sleep(60)
                 newChat(prompt)
+
 def newChat(prompt):
     st.session_state.modelIndex += 1  # תוסיף 1 למספר המודלים
     if st.session_state.modelIndex == len(all_models):  # אם נגמרו המודלים - תחזור לראשון
