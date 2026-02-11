@@ -6,7 +6,7 @@ import streamlit as st
 from google import genai  # generative ai = בינה מלאכותית יוצרת
 from google.genai import types  #מאפשר להגדיר תפקידים של רכיבים שנשלחים לג'מיני
 
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 
 #טול חיפוש באינטרנט
@@ -14,13 +14,16 @@ def web_search(query:str) -> str:   #מקבל טקסט ומחזיר טקסט
     print("searching: " + query)
     """
     פונקציה שמקבלת ערכים לחיפוש ומחזירה תוצאות מובילות
+    הפונקציה תקבל טקסט לחיפוש (עדיף שיהיה כתוב באנגלית)
+    ותחזיר את התוצאות
     """
-    #חיפוש
-    with DDGS() as d:
-        results = d.text(query,max_results=3)
-        print(results)
+    with st.status("searching: " + query):
+        #חיפוש
+        with DDGS() as d:
+            results = d.text(query,max_results=3)
+            return results
 
-web_search("Israel")
+#web_search("Israel - Iran War 2025")
 
 
 st.session_state.page = "" #באיזה דף אני
@@ -63,7 +66,7 @@ def create_chat(model,instruction,history=[]):  #מקבל מודל והיסטו�
         history= history,
         config = types.GenerateContentConfig(
             system_instruction = instruction,   #ההוראות לג'מיני
-            tools = [currentTime], #מה הוא יכול לעשות
+            tools = [currentTime,web_search], #מה הוא יכול לעשות
             automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=False) #תפעיל את הטול אם אתה רוצה
         )
     ) #יוצרים צ'אט במודל ששלחנו
@@ -114,6 +117,8 @@ def sendMessage(prompt): #פונקציה ששולחת הודעה
             with st.spinner("יותר מדי קריאות - מחכים דקה...", show_time=True):
                 time.sleep(60)
                 newChat(prompt)
+        if "503" in error:    #אם יש בעיית ביקוש גבוה למודל - נעבור לבא
+            newChat(prompt)
 
 def newChat(prompt):
     st.session_state.modelIndex += 1  # תוסיף 1 למספר המודלים
