@@ -80,7 +80,7 @@ if  "history" not in st.session_state: #אם אין היסטוריה - ליצו�
     st.session_state.history = []
 
 
-def sendMessage(prompt): #פונקציה ששולחת הודעה
+def sendMessage(prompt, image=None): #פונקציה ששולחת הודעה
     #שומרים את ההודעה בהיסטוריה
     st.session_state.history.append(
         {
@@ -93,8 +93,11 @@ def sendMessage(prompt): #פונקציה ששולחת הודעה
     global currentTry
     print(all_models[st.session_state.modelIndex])
   #  st.caption(all_models[st.session_state.modelIndex])
+    context = [prompt] #בתוך רשימה - כי המודל אולי יקבל כמה רכיבים
+    if image:
+        context.append(image)
     try: #תנסה
-        answer =  st.session_state.chat.send_message(prompt) #שולחים
+        answer =  st.session_state.chat.send_message(context) #שולחים
         st.session_state.history.append(
             {
                 "role": "model",
@@ -103,6 +106,8 @@ def sendMessage(prompt): #פונקציה ששולחת הודעה
         )
         Message("ai",answer.text)
         currentTry = 0 #איפוס
+        st.rerun()
+
         #אם הוא הצליח - נמשיך מפה
     except Exception as e: #אם לא הצליח
         error = str(e) #תהפוך לטקסט
@@ -112,22 +117,22 @@ def sendMessage(prompt): #פונקציה ששולחת הודעה
             st.error("תקלה - כל המודלים לא עובדים היום")
             return
         if "overloaded" in error.lower(): #תבדוק האם מופיע שהסיבה היא שהמודל עמוס
-            newChat(prompt)
+            newChat(prompt, image)
         if "429" in error: #אם קיבלנו שגיאה של יותר מדי קריאות
             with st.spinner("יותר מדי קריאות - מחכים דקה...", show_time=True):
                 time.sleep(60)
-                newChat(prompt)
+                newChat(prompt,image)
         if "503" in error:    #אם יש בעיית ביקוש גבוה למודל - נעבור לבא
-            newChat(prompt)
+            newChat(prompt,image)
 
-def newChat(prompt):
+def newChat(prompt,image=None):
     st.session_state.modelIndex += 1  # תוסיף 1 למספר המודלים
     if st.session_state.modelIndex == len(all_models):  # אם נגמרו המודלים - תחזור לראשון
         st.session_state.modelIndex = 0  # חוזר להיות 0
     newmodel = all_models[st.session_state.modelIndex]
     st.info(f"trying {newmodel}")
     create_chat(newmodel, "")  # צור צ'אט חדש
-    sendMessage(prompt)  # תשלח את ההודעה
+    sendMessage(prompt,image)  # תשלח את ההודעה
 
 
 #פונקציה שטוענת את הAPI KEY ומחזירה אותו
