@@ -28,6 +28,8 @@ def web_search(query:str) -> str:   #מקבל טקסט ומחזיר טקסט
 
 st.session_state.page = "" #באיזה דף אני
 def newPage(pagename): #פונקציה שבודקת האם החלפתי דף
+    if "page" not in st.session_state:
+        st.session_state.page = ""
     if st.session_state.page != pagename:  #האם התחלף הדף
         print("דף חדש")
         st.session_state.page = pagename #שומרים אם השם של הדף החדש
