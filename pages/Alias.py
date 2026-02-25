@@ -10,6 +10,8 @@ st.set_page_config(
     page_icon='🤖'
 )
 
+newPage("Alias")
+
 setRTL()
 
 st.title("משחק אליאס")
