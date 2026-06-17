@@ -23,7 +23,6 @@ def web_search(query:str) -> str:   #מקבל טקסט ומחזיר טקסט
             results = d.text(query,max_results=3)
             return results
 
-#web_search("Israel - Iran War 2025")
 
 
 st.session_state.page = "" #באיזה דף אני
@@ -38,11 +37,14 @@ def newPage(pagename): #פונקציה שבודקת האם החלפתי דף
 
 
 all_models = [
-    "gemini-2.5-flash-lite",
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-3.0-flash",
-    "gemini-2.0-flash-lite"]
+    "gemini-3.1-flash-lite", #500 הודעות ביום
+    "gemini-2.5-flash-lite", #20 הודעות
+    "gemini-2.5-flash", #10 הודעות
+   # "gemini-2.0-flash",
+    "gemini-3-flash",
+    "gemini-3-flash-preview"
+   # "gemini-2.0-flash-lite"
+]
 
 
 #tool - זמנים
