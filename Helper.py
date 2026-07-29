@@ -9,6 +9,9 @@ from google.genai import types  #מאפשר להגדיר תפקידים של ר�
 from ddgs import DDGS
 
 
+if "modelIndex" not in st.session_state:
+    st.session_state.modelIndex = 0
+
 #טול חיפוש באינטרנט
 def web_search(query:str) -> str:   #מקבל טקסט ומחזיר טקסט
     print("searching: " + query)
@@ -57,8 +60,50 @@ def currentTime():
     return time.ctime()
 
 
+#טול - כלי - ליצירת שאלות - תשובות - הבוט מחליט לבד מדי להפעיל - אנחנו אומרים לו מה הקוד
+def ask_question(question:str,options:list[str]):
+    print("מכין שאלות")
+    """
+    כלי לשאילת שאלה כדי להבהיר מצב כלשהו
+    כל פעם שולח שאלה אחת + 2-4 אפשרויות שאתה רוצה לשאול את המשתמש
+    :param question: השאלה שאתה שואל
+    :param options: 2-4 אפשרויות מתאימות
+    :return: סטטוס
+    """
+    st.session_state.question = question
+    st.session_state.options = options
+    st.session_state.status = "wait for answer"
+
+    #st.rerun() #רענון - מציג את האפשרויות
+    return "השאלה נשלחה למשתמש - אל תעשה שום דבר. פשוט תחכה ואל תכתוב כלום"
+
+#כלי שמסמן ששלב הסתיים
+def mark_step_done(step_name:str,summary:str,next_step:str):
+    """
+    פונקציה שמסמנת לסוכן שהוא סיים שלב ואפשר לעבור לשלב הבא
+    :param step_name: שם השלב שסיימנו
+    :param summary: תקציר מצומצם - מה צריך לדעת בשביל השלב הבא.
+    :param next_step: מה השלב הבא
+    """
+    st.session_state.status = "chat"
+    print(step_name,summary,next_step)
+    st.session_state.completed_steps.append(step_name)
+    st.session_state.current_step = next_step
+    #פה נעשה משהו עם התקציר
+    return f"""
+                שלב {step_name} הסתיים בהצלחה!
+                תקציר מה היה: {summary}
+                השלב הבא: {next_step}
+                שלח הודעת התחלה לשלב הבא (סיימנו את שלב.. נעבור ל..)
+            """
+
+
+
+
+tools = [currentTime,web_search]
 #st.session_state - הזיכרון של האפליקציה
 def create_chat(model,instruction,history=[]):  #מקבל מודל והיסטוריה - לרוב ריקה
+    print(tools)
     if "client" not in st.session_state: #אם אין קליינט בזיכרון
         st.session_state.client = genai.Client(api_key=getAPIkey()) #יוצר קליינט עם הAPI Key
     if instruction == "": #אם אין הוראות
@@ -70,10 +115,11 @@ def create_chat(model,instruction,history=[]):  #מקבל מודל והיסטו�
         history= history,
         config = types.GenerateContentConfig(
             system_instruction = instruction,   #ההוראות לג'מיני
-            tools = [currentTime,web_search], #מה הוא יכול לעשות
+            tools = tools, #מה הוא יכול לעשות
             automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=False) #תפעיל את הטול אם אתה רוצה
         )
     ) #יוצרים צ'אט במודל ששלחנו
+
 
 st.session_state.modelIndex = 0 #מתחילים מהמודל הראשון
 
@@ -85,6 +131,8 @@ if  "history" not in st.session_state: #אם אין היסטוריה - ליצו�
 
 
 def sendMessage(prompt, image=None): #פונקציה ששולחת הודעה
+    if "modelIndex" not in st.session_state:
+        st.session_state.modelIndex = 0
     #שומרים את ההודעה בהיסטוריה
     st.session_state.history.append(
         {
@@ -139,6 +187,7 @@ def newChat(prompt,image=None):
     sendMessage(prompt,image)  # תשלח את ההודעה
 
 
+
 #פונקציה שטוענת את הAPI KEY ומחזירה אותו
 def getAPIkey():
     load_dotenv()
@@ -153,6 +202,15 @@ def setRTL():
         direction: rtl;
         text-align: right;
     }
+    code,pre{
+        direction: ltr;
+        text-align: left;
+    }
+    p,h1,h2,h3,h4,h5,h6,ol,ul{
+        direction: rtl;
+        text-align: right;
+    }
+    
     </style>
     """, unsafe_allow_html=True)
 

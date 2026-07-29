@@ -40,6 +40,7 @@ def start():  # פעם ראשונה שנכנסנו
 
 # gemini = genai.Client(api_key=API_KEY) #
 
+
 # הוראה -
 prompt = """
     ###הקשר

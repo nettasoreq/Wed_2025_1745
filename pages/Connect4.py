@@ -4,6 +4,7 @@ import streamlit as st
 import random
 
 import copy
+#from Helper import *
 
 #משתנים קבועים
 ROWS = 6
@@ -12,7 +13,7 @@ COLS = 7
 PLAYER = "🟣"
 COMPUTER = "🟡"
 EMPTY = "⚪"
-
+#setRTL()
 
 #moves = 3
 if "moves" not in st.session_state:
